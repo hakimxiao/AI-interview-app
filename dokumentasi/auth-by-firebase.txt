@@ -1,0 +1,62 @@
+1. Registrasi akun firebase 
+2. Buat new console 
+3. klik authentikasi 
+4. klik email/password klik enable untuk provider
+5. kembali ke overview
+6. pilih firestore database, daftarkan 
+7. kembali ke overview klik ikon web
+8. isi form dan kemudian anda akan di arahkan untuk install firebase ke aplikasi. Ikuti arahan tersebut untuk install dan copy kode yang 
+    diberikan
+9. setelah selesai kembali dan di menu overview sebelah kiri ada menu setting silahkan di klik dan pilih project settings dan pergi 
+    ke service account 
+10. Klik generate private key, dan diakan memberikan json file cukup ambil {project_id, private_key_id, private_key, client_email}
+    kemudian buat file .env di root dan paste hal tadi dan jangan lupa di rename. Private key tinggalkan aja tidak apa.
+11. kunjungi ini https://firebase.google.com/docs/admin/setup kemudian cari setup admin sdk. ikutin arahannya
+12. setelah kalian menginstall package firebase admin masuk kedalam folder firebase dan buat file baru bernama admin.ts dan isikan hal ini :
+        import { getApps, initializeApp, cert } from 'firebase-admin/app'
+        import { getAuth } from 'firebase-admin/auth'
+        import { getFirestore } from 'firebase-admin/firestore'
+
+        const initFirebaseAdmin = () => {
+            const apps = getApps();
+
+
+            if(!apps.length) {
+                initializeApp({
+                    credential: cert({
+                        projectId: process.env.FIREBASE_PROJECT_ID,
+                        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+                    })
+                })
+            }
+
+            return {
+                auth: getAuth(),
+                db: getFirestore()
+            }
+        }
+
+        export const { auth, db } = initFirebaseAdmin();
+13. buka file yang ada di firebase/client.ts kemudian lakukkan penyesuaian seperti berikut :
+            
+        import { initializeApp, getApp, getApps } from "firebase/app";
+        import { getAuth } from "firebase/auth";
+        import { getFirestore } from "firebase/firestore";
+
+
+        const firebaseConfig = {
+        apiKey: "AIzaSyBLNSLuN6fJdXNqpyacWwz5XuUFZiKj8c0",
+        authDomain: "prepwise-ff1fd.firebaseapp.com",
+        projectId: "prepwise-ff1fd",
+        storageBucket: "prepwise-ff1fd.firebasestorage.app",
+        messagingSenderId: "569709246742",
+        appId: "1:569709246742:web:1ef63635cdd23f5359b837",
+        measurementId: "G-L9MY1F4TKJ"
+        };
+
+
+        const app = !getApps.length ? initializeApp(firebaseConfig) : getApp();
+
+        export const auth = getAuth(app);
+        export const db = getFirestore(app);
