@@ -60,3 +60,245 @@
 
         export const auth = getAuth(app);
         export const db = getFirestore(app);
+
+
+Tentu! Berikut ini adalah **versi lengkap, profesional, dan mudah dipahami** dari tutorial autentikasi Firebase menggunakan **Next.js**, dilengkapi dengan:
+
+* Penjelasan setiap langkah
+* Arti dan makna kode
+* Referensi dokumentasi resmi Firebase
+
+---
+
+## 🔐 Autentikasi Firebase dengan Next.js (Lengkap + Penjelasan)
+
+Tutorial ini menjelaskan cara menghubungkan **Firebase Authentication** dan **Firestore Database** ke aplikasi **Next.js**, serta menjelaskan **arti dari setiap bagian kode** agar kamu memahami apa yang sebenarnya kamu bangun.
+
+---
+
+### ✳️ 1. Buat Proyek Firebase
+
+**Langkah:**
+
+* Kunjungi: [https://console.firebase.google.com/](https://console.firebase.google.com/)
+* Klik “**Add project**” → beri nama → Next → selesai
+
+**Tujuan:** Membuat container cloud untuk menyimpan data dan autentikasi aplikasi.
+
+📚 Referensi: [Create a Firebase project](https://firebase.google.com/docs/web/setup)
+
+---
+
+### 🔐 2. Aktifkan Metode Login
+
+**Langkah:**
+
+* Masuk ke menu **Authentication** di sidebar Firebase Console
+* Tab **Sign-in method** → pilih **Email/Password**
+* Klik **Enable** → Simpan
+
+**Tujuan:** Mengizinkan pengguna login menggunakan email dan password.
+
+📚 Referensi: [Enable email/password sign-in](https://firebase.google.com/docs/auth/web/password-auth)
+
+---
+
+### 📦 3. Aktifkan Firestore Database
+
+**Langkah:**
+
+* Di dashboard Firebase, klik **Firestore Database**
+* Klik **Create database** → pilih **Start in test mode**
+* Pilih region → Next
+
+**Tujuan:** Menyediakan database NoSQL realtime untuk menyimpan data pengguna.
+
+📚 Referensi: [Get started with Cloud Firestore](https://firebase.google.com/docs/firestore/quickstart)
+
+---
+
+### 🌐 4. Hubungkan Firebase dengan Aplikasi Web
+
+**Langkah:**
+
+* Di dashboard, klik ikon **\</>** (Web App) → beri nama app → daftarkan
+* Firebase akan memberi konfigurasi seperti ini:
+
+```js
+const firebaseConfig = {
+  apiKey: "xxxx",
+  authDomain: "xxx.firebaseapp.com",
+  projectId: "xxx",
+  storageBucket: "xxx.appspot.com",
+  messagingSenderId: "xxx",
+  appId: "xxx",
+  measurementId: "xxx"
+}
+```
+
+* Install Firebase SDK di project Next.js:
+
+```bash
+npm install firebase
+```
+
+**Tujuan:** Menghubungkan aplikasi ke layanan Firebase frontend.
+
+📚 Referensi: [Add Firebase to your web app](https://firebase.google.com/docs/web/setup)
+
+---
+
+### 🔑 5. Setup Admin SDK (Untuk Server-Side)
+
+Firebase Admin SDK digunakan di **server-side (Next.js API routes)** untuk memverifikasi token, mengelola akun, dan mengakses database dengan kredensial penuh.
+
+#### a. Generate Service Account Key
+
+* Masuk ke **Project Settings** → tab **Service accounts**
+* Klik **Generate new private key** → simpan file JSON
+* Ambil properti:
+
+  * `project_id`
+  * `private_key`
+  * `client_email`
+
+#### b. Tambahkan ke `.env.local`
+
+```env
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_client_email
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\\nABC\\nDEF\\n-----END PRIVATE KEY-----\\n"
+```
+
+❗ Penting: Private key mengandung baris `\n`, pastikan untuk **escape** saat ditulis di `.env`.
+
+---
+
+### ⚙️ 6. Konfigurasi Admin SDK (`admin.ts`)
+
+Buat folder `firebase/admin.ts`:
+
+```ts
+// firebase/admin.ts
+
+import { getApps, initializeApp, cert } from 'firebase-admin/app'
+import { getAuth } from 'firebase-admin/auth'
+import { getFirestore } from 'firebase-admin/firestore'
+
+// Fungsi untuk inisialisasi Firebase Admin SDK
+const initFirebaseAdmin = () => {
+  const apps = getApps() // Mengecek apakah sudah ada instance firebase admin
+
+  if (!apps.length) {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') // Mengatasi karakter newline
+      })
+    })
+  }
+
+  return {
+    auth: getAuth(),       // Mengelola akun user (server-side)
+    db: getFirestore()     // Mengakses Firestore database (server-side)
+  }
+}
+
+export const { auth, db } = initFirebaseAdmin()
+```
+
+📚 Referensi: [Initialize Admin SDK](https://firebase.google.com/docs/admin/setup)
+
+---
+
+### 👨‍💻 7. Konfigurasi Firebase Client SDK (`client.ts`)
+
+Digunakan untuk autentikasi dan akses database di sisi **klien (browser/React)**.
+
+```ts
+// firebase/client.ts
+
+import { initializeApp, getApp, getApps } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+
+// Konfigurasi yang didapat dari Firebase Console
+const firebaseConfig = {
+  apiKey: "AIzaSyBLNSLuN6fJdXNqpyacWwz5XuUFZiKj8c0",
+  authDomain: "prepwise-ff1fd.firebaseapp.com",
+  projectId: "prepwise-ff1fd",
+  storageBucket: "prepwise-ff1fd.appspot.com",
+  messagingSenderId: "569709246742",
+  appId: "1:569709246742:web:1ef63635cdd23f5359b837",
+  measurementId: "G-L9MY1F4TKJ"
+}
+
+// Mencegah inisialisasi ganda saat hot-reload di dev
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+
+export const auth = getAuth(app)     // Autentikasi user (client-side)
+export const db = getFirestore(app)  // Firestore database (client-side)
+```
+
+📚 Referensi:
+
+* [Firebase Web Client SDK](https://firebase.google.com/docs/web/setup)
+* [Authentication in Firebase](https://firebase.google.com/docs/auth/web/start)
+
+---
+
+### 📌 Perbedaan `admin.ts` vs `client.ts`
+
+| Aspek              | `firebase/admin.ts`                | `firebase/client.ts`                  |
+| ------------------ | ---------------------------------- | ------------------------------------- |
+| Lokasi digunakan   | Server-side (API Routes, SSR)      | Client-side (React component, hooks)  |
+| SDK yang digunakan | `firebase-admin`                   | `firebase`                            |
+| Hak akses          | Penuh (admin, tidak terbatas)      | Terbatas ke akun user yang login      |
+| Contoh kegunaan    | Verifikasi token, akses semua user | Login, logout, registrasi, akses data |
+
+---
+
+## 🚀 Tahap Selanjutnya
+
+Setelah setup berhasil, kamu bisa lanjut:
+
+### ➕ Buat Halaman Register/Login
+
+Menggunakan Firebase `auth`:
+
+```ts
+// Register user
+createUserWithEmailAndPassword(auth, email, password)
+
+// Login user
+signInWithEmailAndPassword(auth, email, password)
+```
+
+### ➕ Proteksi Halaman (Auth Middleware)
+
+Buat API route yang memverifikasi token login menggunakan `admin.auth().verifyIdToken()`.
+
+📚 Referensi: [Verify ID Token](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
+
+---
+
+## 🧠 Kesimpulan
+
+Dengan tutorial ini, kamu sudah memahami:
+
+* Cara menghubungkan Firebase ke aplikasi Next.js
+* Perbedaan penggunaan SDK Admin dan Client
+* Setup `.env` dan struktur file Firebase yang aman
+* Arti setiap baris kode dan bagaimana mereka bekerja bersama
+
+---
+
+Kalau kamu ingin lanjut membuat:
+
+* UI login & register
+* Otentikasi menggunakan Google/Facebook
+* Middleware proteksi route Next.js
+* Logout, reset password, email verification
+
+Silakan beri tahu ya, nanti saya bantu panduan lanjutan sesuai kebutuhanmu.
