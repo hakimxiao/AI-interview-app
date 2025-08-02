@@ -64,7 +64,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        toast.success("Account created successfully please sign in");
+        toast.success("Berhasil membuat akun user, Tolong untuk login");
         router.push("/sign-in");
       } else {
         const { email, password } = values;

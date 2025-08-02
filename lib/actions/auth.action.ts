@@ -22,9 +22,13 @@ export async function signUp(params: SignUpParams) {
         }
 
         await db.collection('user').doc(uid).set({
-            name: name,
-            email: email
+            name, email
         })
+
+        return {
+            success: true,
+            message: "Berhasil membuat akun user, Tolong untuk login"
+        }
 
     } catch (e: any) {
         console.error('Gagal membuat akun user', e);
