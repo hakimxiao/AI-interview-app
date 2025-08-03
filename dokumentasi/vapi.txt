@@ -1,0 +1,15 @@
+Untuk melakukkan setup Dan lain lain berikut dokumentasinya : 
+    1.  Kunjungi web resmi vapi dan, buka dokumentasi web calls di docs vapi :
+            nanti anda akan diminta menginstall : npm install @vapi-ai/web
+    2.  Kembali ke vapi dashboard dan di panel kiri bawah ada vapi API key 
+            copy api key yang public dan pastekkan di dalam .env dengan format NEXT_PUBLIC
+    3.  Inisialisasi file untuk vapi client didalam lib vapi.sdk.ts dengan isi berikut : 
+            import Vapi from '@vapi-ai/web';
+
+            export const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN!);
+    4.  Setup selesai dan untuk lengkap Kunjungi : https://docs.vapi.ai/quickstart/web
+
+
+VAPI WORKFLOWS : 
+    Vapi workflows adalah alur kerja otomatis yang mengatur bagaimana sistem berbasis suara (voice AI) merespons dan berinteraksi
+    dengan pengguna, langkah demi langkah.
