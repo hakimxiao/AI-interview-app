@@ -1,0 +1,7 @@
+Setup google gemini sangatlah mudah hanya ada 2 fase yaitu :
+    #   Kunjungi : https://aistudio.google.com/
+            Kemudian anda cari generate API KEY, copy kemudian paste di .env
+    #   Install : AI SDK dari vercel : npm install ai @ai-sdk/google
+
+* Tapi di vase ini gemini kita sudah bisa di akses akan tetapi masih belum bisa bicara oleh karena itu 
+  kita akan menggunakan VAPI untuk juru bicaranya.
